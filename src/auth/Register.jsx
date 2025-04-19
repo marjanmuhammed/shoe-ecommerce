@@ -34,7 +34,7 @@ export default function Register() {
     try {
 
       // 🔥 Check if email already exists
-      const res = await axios.get("http://localhost:3000/users");
+      const res = await axios.get("https://json-sever-mru6.onrender.com/users");
       const existingUser = res.data.find((u) => u.email === email &&  u.password=== password);
 
       
@@ -49,7 +49,7 @@ export default function Register() {
       const newUser = { name, email, password, cart: [], orders: [] };
 
       // Save to JSON server
-      await axios.post("http://localhost:3000/users", newUser);
+      await axios.post("https://json-sever-mru6.onrender.com/users", newUser);
 
       // Redirect to login page after registration
       navigate("/login");

@@ -34,7 +34,7 @@ export default function Login() {
         return;
       }
 
-      const { data: users } = await axios.get("http://localhost:3000/users");
+      const { data: users } = await axios.get("https://json-sever-mru6.onrender.com/users");
       const user = users.find((u) => u.email === email && u.password === password);
 
       console.log("User found:", user); // Debug log

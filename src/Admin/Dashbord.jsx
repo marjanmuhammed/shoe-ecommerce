@@ -25,10 +25,10 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         const urls = {
-          men: "http://localhost:3000/men",
-          women: "http://localhost:3000/women",
-          deals: "http://localhost:3000/deals",
-          users: "http://localhost:3000/users",
+          men: "https://json-sever-mru6.onrender.com/men",
+          women: "https://json-sever-mru6.onrender.com/women",
+          deals: "https://json-sever-mru6.onrender.com/deals",
+          users: "https://json-sever-mru6.onrender.com/users",
         };
 
         const responses = await Promise.all(

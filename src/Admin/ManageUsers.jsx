@@ -14,7 +14,7 @@ const ManageUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/users");
+      const res = await axios.get("https://json-sever-mru6.onrender.com/users");
       setUsers(res.data);
     } catch (error) {
       console.error("Error fetching users", error);
@@ -24,7 +24,7 @@ const ManageUsers = () => {
   const handleViewUser = async (user) => {
     setSelectedUser(user);
     try {
-      const res = await axios.get("http://localhost:3000/orders");
+      const res = await axios.get("https://json-sever-mru6.onrender.com/orders");
       const filteredOrders = res.data.filter((order) => order.userId === user.id);
       setUserOrders(filteredOrders);
     } catch (error) {
@@ -35,7 +35,7 @@ const ManageUsers = () => {
   const toggleBlockUser = async () => {
     if (!userToBlock) return;
     try {
-      await axios.put(`http://localhost:3000/users/${userToBlock.id}`, { ...userToBlock, blocked: !userToBlock.blocked });
+      await axios.put(`https://json-sever-mru6.onrender.com/users/${userToBlock.id}`, { ...userToBlock, blocked: !userToBlock.blocked });
       fetchUsers();
       setShowBlockModal(false);
     } catch (error) {
@@ -48,7 +48,7 @@ const ManageUsers = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:3000/users/${userId}`);
+      await axios.delete(`https://json-sever-mru6.onrender.com/users/${userId}`);
       fetchUsers();
     } catch (error) {
       console.error("Error deleting user", error);

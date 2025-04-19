@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Men from "./pages/Men";
 import Women from "./pages/Women";
-import BestDeals from "./pages/BestDeals";
+import BestDeals from './pages/Bestdeals'
 import OurStory from "./pages/Ourstory";
 import Contact from "./pages/Contact";
 import Cart from "./cartcontext/Cart";

@@ -17,7 +17,7 @@ const ProductProvider = ({ children }) => {
   }, []);
   const fetchMenShoes = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/men");
+      const response = await axios.get("https://json-sever-mru6.onrender.com/men");
       console.log("Men API Response:", response.data); // 👀 Log API response
   
       const formattedMenShoes = response.data.map((shoe) => ({
@@ -34,7 +34,7 @@ const ProductProvider = ({ children }) => {
 
   const fetchWomenShoes = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/women");
+      const response = await axios.get("https://json-sever-mru6.onrender.com/women");
       setWomenShoes(response.data);
     } catch (error) {
       console.error("Error fetching women's shoes:", error);
@@ -43,7 +43,7 @@ const ProductProvider = ({ children }) => {
 
   const fetchHomeShoes = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/products"); // ✅ Home page products API
+      const response = await axios.get("https://json-sever-mru6.onrender.com/products"); // ✅ Home page products API
       setHomeShoes(response.data);
     } catch (error) {
       console.error("Error fetching home shoes:", error);
@@ -51,7 +51,7 @@ const ProductProvider = ({ children }) => {
   };
   const fetchDealsShoes = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/deals"); // ✅ Correct API
+      const response = await axios.get("https://json-sever-mru6.onrender.com/deals"); // ✅ Correct API
       setDealsShoes(response.data); // ✅ Correct state update
     } catch (error) {
       console.error("Error fetching deals shoes:", error); // ✅ Correct error message

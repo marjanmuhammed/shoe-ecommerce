@@ -233,7 +233,7 @@ const ManageProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const url = `http://localhost:3000/${selectedCategory}`;
+      const url = `https://json-sever-mru6.onrender.com/${selectedCategory}`;
       console.log("Fetching from:", url);
       const res = await axios.get(url);
       console.log("Fetched Products:", res.data);
@@ -270,7 +270,7 @@ const ManageProducts = () => {
       if (editingProduct) {
         const updatedProduct = { ...productData, category: selectedCategory };
         await axios.put(
-          `http://localhost:3000/${selectedCategory}/${editingProduct.id}`,
+          `https://json-sever-mru6.onrender.com/${selectedCategory}/${editingProduct.id}`,
           updatedProduct
         );
       } else {
@@ -279,7 +279,7 @@ const ManageProducts = () => {
           return;
         }
         const res = await axios.post(
-          `http://localhost:3000/${selectedCategory}`,
+          `https://json-sever-mru6.onrender.com/${selectedCategory}`,
           productData
         );
         console.log(res.data);
@@ -301,7 +301,7 @@ const ManageProducts = () => {
 
   const handleDelete = async (id) => {
     try {
-      const url = `http://localhost:3000/${selectedCategory}/${id}`;
+      const url = `https://json-sever-mru6.onrender.com/${selectedCategory}/${id}`;
       console.log("Deleting from:", url);
       await axios.delete(url);
       fetchProducts();
