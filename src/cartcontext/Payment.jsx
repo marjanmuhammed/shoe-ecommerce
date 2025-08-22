@@ -14,8 +14,8 @@ const Payment = () => {
   const [newAddress, setNewAddress] = useState({
     fullName: "",
     email: "",
-    phone: "",
-    address: "",
+    phoneNumber: "",
+    addressLine: "",
     pincode: ""
   });
   const [userId, setUserId] = useState(null);
@@ -102,11 +102,11 @@ const Payment = () => {
     const finalAddress = selectedAddressId && addresses.length > 0
       ? addresses.find(a => a.id === selectedAddressId)
       : {
-          FullName: newAddress.fullName,
-          Email: newAddress.email,
-          PhoneNumber: newAddress.phone,
-          AddressLine: newAddress.address,
-          Pincode: newAddress.pincode,
+          fullName: newAddress.fullName,
+          email: newAddress.email,
+          phoneNumber: newAddress.phoneNumber,
+          addressLine: newAddress.addressLine,
+          pincode: newAddress.pincode,
         };
 
     const orderData = {
@@ -131,13 +131,13 @@ const Payment = () => {
 
     try {
       const payload = {
-        id: editingAddressId || 0,
+       id: editingAddressId || 0,
         fullName: newAddress.fullName,
         email: newAddress.email,
-        phoneNumber: newAddress.phone,
-        addressLine: newAddress.address,
+        phoneNumber: newAddress.phoneNumber,
+        addressLine: newAddress.addressLine,
         pincode: newAddress.pincode,
-        userId: userId
+   
       };
 
       if (editingAddressId) {
@@ -151,8 +151,8 @@ const Payment = () => {
       setNewAddress({
         fullName: userProfile?.fullName || "",
         email: userProfile?.email || "",
-        phone: "",
-        address: "",
+        phoneNumber: "",
+        addressLine: "",
         pincode: ""
       });
       setShowNewAddressForm(false);
@@ -196,11 +196,11 @@ const Payment = () => {
 
     setEditingAddressId(addr.id);
     setNewAddress({
-      fullName: addr.fullName || addr.FullName || "",
-      email: addr.email || addr.Email || "",
-      phone: addr.phoneNumber || addr.PhoneNumber || "",
-      address: addr.addressLine || addr.AddressLine || "",
-      pincode: addr.pincode || addr.Pincode || ""
+      fullName: addr.fullName || "",
+      email: addr.email || "",
+      phoneNumber: addr.phoneNumber || "",
+      addressLine: addr.addressLine || "",
+      pincode: addr.pincode || ""
     });
     setShowNewAddressForm(true);
   };
@@ -208,8 +208,8 @@ const Payment = () => {
   const isAddressValid = 
     newAddress.fullName &&
     newAddress.email &&
-    newAddress.phone &&
-    newAddress.address &&
+    newAddress.phoneNumber &&
+    newAddress.addressLine &&
     newAddress.pincode;
 
   if (isLoading) {
@@ -247,9 +247,9 @@ const Payment = () => {
                     key={addr.id}
                     className={`border p-4 rounded-lg ${selectedAddressId === addr.id ? "border-blue-500 bg-blue-50" : ""}`}
                   >
-                    <p className="font-bold text-gray-800">{addr.fullName || addr.FullName}</p>
-                    <p className="text-gray-600">{addr.addressLine || addr.AddressLine}, {addr.pincode || addr.Pincode}</p>
-                    <p className="text-gray-600">Mobile: {addr.phoneNumber || addr.PhoneNumber}</p>
+                    <p className="font-bold text-gray-800">{addr.fullName}</p>
+                    <p className="text-gray-600">{addr.addressLine}, {addr.pincode}</p>
+                    <p className="text-gray-600">Mobile: {addr.phoneNumber}</p>
                     
                     <div className="flex gap-2 mt-2">
                       <button
@@ -288,8 +288,8 @@ const Payment = () => {
                   setNewAddress({
                     fullName: userProfile?.fullName || "",
                     email: userProfile?.email || "",
-                    phone: "",
-                    address: "",
+                    phoneNumber: "",
+                    addressLine: "",
                     pincode: ""
                   });
                 }}
@@ -322,8 +322,8 @@ const Payment = () => {
                   <input
                     type="tel"
                     placeholder="Phone"
-                    value={newAddress.phone}
-                    onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
+                    value={newAddress.phoneNumber}
+                    onChange={(e) => setNewAddress({ ...newAddress, phoneNumber: e.target.value })}
                     className="border p-3 rounded"
                     required
                   />
@@ -338,8 +338,8 @@ const Payment = () => {
                   <input
                     type="text"
                     placeholder="Address"
-                    value={newAddress.address}
-                    onChange={(e) => setNewAddress({ ...newAddress, address: e.target.value })}
+                    value={newAddress.addressLine}
+                    onChange={(e) => setNewAddress({ ...newAddress, addressLine: e.target.value })}
                     className="border p-3 rounded col-span-2"
                     required
                   />
@@ -362,8 +362,8 @@ const Payment = () => {
                         setNewAddress({
                           fullName: userProfile?.fullName || "",
                           email: userProfile?.email || "",
-                          phone: "",
-                          address: "",
+                          phoneNumber: "",
+                          addressLine: "",
                           pincode: ""
                         });
                       }}
@@ -400,15 +400,15 @@ const Payment = () => {
               <h3 className="font-semibold mb-2">Delivery to:</h3>
               {selectedAddressId && addresses.length > 0 ? (
                 <div>
-                  <p className="font-bold text-gray-800">{addresses.find(a => a.id === selectedAddressId)?.fullName || addresses.find(a => a.id === selectedAddressId)?.FullName}</p>
-                  <p className="text-gray-600">{addresses.find(a => a.id === selectedAddressId)?.addressLine || addresses.find(a => a.id === selectedAddressId)?.AddressLine}, {addresses.find(a => a.id === selectedAddressId)?.pincode || addresses.find(a => a.id === selectedAddressId)?.Pincode}</p>
-                  <p className="text-gray-600">Mobile: {addresses.find(a => a.id === selectedAddressId)?.phoneNumber || addresses.find(a => a.id === selectedAddressId)?.PhoneNumber}</p>
+                  <p className="font-bold text-gray-800">{addresses.find(a => a.id === selectedAddressId)?.fullName}</p>
+                  <p className="text-gray-600">{addresses.find(a => a.id === selectedAddressId)?.addressLine}, {addresses.find(a => a.id === selectedAddressId)?.pincode}</p>
+                  <p className="text-gray-600">Mobile: {addresses.find(a => a.id === selectedAddressId)?.phoneNumber}</p>
                 </div>
               ) : (
                 <div>
                   <p className="font-bold text-gray-800">{newAddress.fullName}</p>
-                  <p className="text-gray-600">{newAddress.address}, {newAddress.pincode}</p>
-                  <p className="text-gray-600">Mobile: {newAddress.phone}</p>
+                  <p className="text-gray-600">{newAddress.addressLine}, {newAddress.pincode}</p>
+                  <p className="text-gray-600">Mobile: {newAddress.phoneNumber}</p>
                 </div>
               )}
               <button 
