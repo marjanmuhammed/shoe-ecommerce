@@ -98,30 +98,51 @@ const Payment = () => {
     return subtotal;
   };
 
-  const handlePlaceOrder = (paymentStatus = "Pending") => {
-    const finalAddress = selectedAddressId && addresses.length > 0
-      ? addresses.find(a => a.id === selectedAddressId)
-      : {
-          fullName: newAddress.fullName,
-          email: newAddress.email,
-          phoneNumber: newAddress.phoneNumber,
-          addressLine: newAddress.addressLine,
-          pincode: newAddress.pincode,
-        };
+ const handlePlaceOrder = (paymentStatus = "Pending") => {
+  const finalAddress = selectedAddressId && addresses.length > 0
+    ? addresses.find(a => a.id === selectedAddressId)
+    : {
+        fullName: newAddress.fullName,
+        email: newAddress.email,
+        phoneNumber: newAddress.phoneNumber,
+        addressLine: newAddress.addressLine,
+        pincode: newAddress.pincode,
+      };
 
-    const orderData = {
-      items: cart,
-      totalAmount: getTotalPrice(),
-      paymentMethod,
-      address: finalAddress,
-      paymentStatus,
-      userId,
-    };
-
-    console.log("Placing order:", orderData);
-    localStorage.removeItem("checkoutCart");
-    navigate("/orders");
+  const orderData = {
+    items: cart,
+    totalAmount: getTotalPrice(),
+    paymentMethod,
+    address: finalAddress,
+    paymentStatus,
+    userId,
   };
+
+  console.log("Placing order:", orderData);
+
+  // ✅ Remove ordered items from cart
+  const remainingCart = [];
+  cart.forEach(async (cartItem) => {
+    // Remove from wishlist only if wishlistId exists
+    if (cartItem.wishlistId) {
+      try {
+        await removeFromWishlist(cartItem.wishlistId);
+      } catch (err) {
+        console.error("Failed to remove wishlist item:", err);
+      }
+    }
+    // Remove from cart
+    try {
+      await removeFromCart(cartItem.productId); // use your cart API remove
+    } catch (err) {
+      console.error("Failed to remove cart item:", err);
+    }
+  });
+
+  localStorage.removeItem("checkoutCart");
+  navigate("/orders");
+};
+
 
   const handleRazorpaySuccess = () => handlePlaceOrder("Paid");
   const handleRazorpayFailure = () => alert("Payment Failed");
@@ -247,8 +268,8 @@ const Payment = () => {
                     key={addr.id}
                     className={`border p-4 rounded-lg ${selectedAddressId === addr.id ? "border-blue-500 bg-blue-50" : ""}`}
                   >
-                    <p className="font-bold text-gray-800">{addr.fullName}</p>
-                    <p className="text-gray-600">{addr.addressLine}, {addr.pincode}</p>
+                    <p className="font-bold text-gray-800">Name: {addr.fullName}</p>
+                    <p className="text-gray-600">Address: {addr.addressLine}, {addr.pincode}</p>
                     <p className="text-gray-600">Mobile: {addr.phoneNumber}</p>
                     
                     <div className="flex gap-2 mt-2">
@@ -500,7 +521,9 @@ const Payment = () => {
                 Place Order
               </button>
             ) : (
-              <p className="text-gray-500">Please select a payment method</p>
+             <p className="text-red-600 font-bold animate-pulse text-center mt-2">
+    Please select a payment method
+  </p>
             )}
           </>
         )}

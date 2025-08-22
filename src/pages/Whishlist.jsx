@@ -7,13 +7,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { FaHeart } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { getWishlist, removeFromWishlist } from "../Api/wishlistApi";
+import { addToCart } from "../Api/cartApi";
 
 const WishlistPage = () => {
   const [wishlist, setWishlist] = useState([]);
   const toastConfig = { position: "top-center", autoClose: 2000 };
   const navigate = useNavigate();
 
-  // ✅ Helper function for login check (same as Cart)
   const isLogged = () => localStorage.getItem("isLoggedIn") === "true";
 
   const fetchWishlistData = async () => {
@@ -40,22 +40,29 @@ const WishlistPage = () => {
     }
   };
 
-  // ✅ Checkout handler
-  const goToCheckout = (item) => {
+  const goToCheckout = async (item) => {
     if (!isLogged()) {
       toast.error("Please login to checkout!", toastConfig);
       return;
     }
-    if (!item) {
+
+    if (!item || !item.productId) {
       toast.error("Invalid product selected", toastConfig);
       return;
     }
 
-    // Store selected item in localStorage (optional, like Cart does)
-    localStorage.setItem("checkoutCart", JSON.stringify([item]));
+    try {
+      // ❗ Add product to cart with wishlistId
+      await addToCart(item.productId, 1, item.id); // Pass wishlistId as 3rd param
 
-    // Navigate to /pay page
-    navigate("/pay");
+      toast.success("Product added to cart. Redirecting...", toastConfig);
+
+      // Navigate to payment page
+      navigate("/pay");
+    } catch (err) {
+      console.error(err);
+      toast.error("The product already in the cart go to check out", toastConfig);
+    }
   };
 
   return (
@@ -76,7 +83,6 @@ const WishlistPage = () => {
                 transition={{ duration: 0.5 }}
                 className="relative p-4 bg-white rounded-lg shadow-lg hover:shadow-xl transition-transform"
               >
-                {/* Remove favourite */}
                 <FaHeart
                   size={20}
                   className="absolute top-2 right-2 text-red-500 cursor-pointer"
@@ -106,7 +112,7 @@ const WishlistPage = () => {
                   onClick={() => goToCheckout(item)}
                   className="mt-3 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-1 rounded flex justify-center items-center gap-2 transition-all duration-300"
                 >
-                  Checkout
+                  Check Out
                 </button>
               </motion.div>
             ))}

@@ -1,5 +1,6 @@
 
 
+
 import api from "../Api/axiosSetup";
 
 const API_URL = "/Cart";
@@ -8,7 +9,9 @@ const API_URL = "/Cart";
 export const getUserCart = () => api.get(`${API_URL}/user`);
 
 // POST add to cart
-export const addToCart = (dto) => api.post(`${API_URL}`, dto);
+export const addToCart = (productId, quantity = 1) => {
+  return api.post(`${API_URL}`, { productId, quantity }); // ✅ send JSON dto
+};
 
 // PUT update cart item quantity
 export const updateCartItem = (cartItemId, quantity) =>

@@ -101,31 +101,42 @@ const Cart = () => {
         </p>
       ) : (
         <>
-          <ul className="space-y-6 px-4 md:px-0 max-w-4xl mx-auto">
-            {cart.map(item => (
-              <li key={item.id || item.cartItemId} className="flex flex-col md:flex-row items-center justify-between p-6 border rounded-lg shadow-lg bg-white">
-                <div className="flex items-center space-x-6">
-                  <img src={item.productImageUrl} alt={item.productName} className="w-28 h-28 object-contain rounded-lg"/>
-                  <div>
-                    <h2 className="font-semibold text-xl">{item.productName}</h2>
-                    <p className="text-gray-600">{item.productDescription}</p>
-                    <p className="text-lg">Price: <span className="font-bold text-green-600">₹{item.productPrice}</span></p>
-                    <div className="flex items-center space-x-4 mt-2">
-                      <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="bg-gray-300 px-3 py-1 rounded">-</button>
-                      <span className="text-lg font-semibold">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="bg-gray-300 px-3 py-1 rounded">+</button>
-                    </div>
-                  </div>
-                </div>
-                <button onClick={() => removeItem(item.id || item.cartItemId)} className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-800 mt-4 md:mt-0">Remove</button>
-              </li>
-            ))}
-          </ul>
-
-          <div className="text-center mt-6 px-4 md:px-0 max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold">Total Amount: <span className="text-green-600">₹{totalAmount.toFixed(2)}</span></h2>
-            <button onClick={handleCheckout} className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-800 transition-all duration-300">Proceed to Checkout</button>
+        <ul className="space-y-6 px-4 md:px-0 max-w-4xl mx-auto">
+  {cart.map(item => (
+    <li key={item.id || item.cartItemId} className="flex flex-col md:flex-row items-center justify-between p-6 border rounded-lg shadow-lg bg-white">
+      <div className="flex items-center space-x-6">
+        <img src={item.productImageUrl} alt={item.productName} className="w-28 h-28 object-contain rounded-lg"/>
+        <div>
+          <h2 className="font-semibold text-xl">{item.productName}</h2>
+          <p className="text-gray-600">{item.productDescription}</p>
+          <p className="text-lg">
+            Price: <span className="font-bold text-green-600">₹{item.productPrice}</span>
+          </p>
+          <div className="flex items-center space-x-4 mt-2">
+            <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="bg-gray-300 px-3 py-1 rounded">-</button>
+            <span className="text-lg font-semibold">{item.quantity}</span>
+            <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="bg-gray-300 px-3 py-1 rounded">+</button>
           </div>
+          {/* ✅ Individual total per product */}
+          <p className="mt-2 text-gray-800 font-semibold">
+            Total: ₹{(item.productPrice * item.quantity).toFixed(2)}
+          </p>
+        </div>
+      </div>
+      <button onClick={() => removeItem(item.id || item.cartItemId)} className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-800 mt-4 md:mt-0">Remove</button>
+    </li>
+  ))}
+</ul>
+
+       <div className="text-center mt-6 px-4 md:px-0 max-w-4xl mx-auto">
+  <h2 className="text-2xl font-bold">
+    Grand Total: <span className="text-green-600">₹{totalAmount.toFixed(2)}</span>
+  </h2>
+  <button onClick={handleCheckout} className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-800 transition-all duration-300">
+    Proceed to Checkout
+  </button>
+</div>
+
         </>
       )}
     </div>
