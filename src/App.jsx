@@ -23,6 +23,7 @@ import Payment from "../src/cartcontext/Payment";
 
 
 
+
 const App = () => {
   return (
     <ProductProvider>
@@ -49,6 +50,8 @@ const App = () => {
           <Route path="/admin/users" element={<ManageUsers />} /> 
           <Route path="/wishlist" element={<Wishlist />} />
            <Route path="/profile" element={<ProfilePage />} />
+
+       
           
         </Routes>
 

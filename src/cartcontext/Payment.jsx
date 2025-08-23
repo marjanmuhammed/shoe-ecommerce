@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import RazorpayPayment from "../Razorpay/RazorpayPayment";
+
 import { fetchUserProfile } from "../Api/userApi";
 import { fetchAddresses, addAddress, updateAddress, deleteAddress } from "../Api/addressApi";
-import { getUserCart } from "../Api/cartApi";
+import { getUserCart, removeCartItem } from "../Api/cartApi";
+import { removeFromWishlist } from "../Api/wishlistApi";
 import { motion } from "framer-motion";
 
 const Payment = () => {
@@ -25,6 +26,7 @@ const Payment = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -88,77 +90,17 @@ const Payment = () => {
     }
   };
 
-  const getSubtotal = () => {
-    return cart.reduce((t, item) => t + item.productPrice * item.productQuantity, 0);
-  };
-
-  const getTotalPrice = () => {
-    const subtotal = getSubtotal();
-    if (paymentMethod === "Cash on Delivery") return subtotal * 1.05;
-    return subtotal;
-  };
-
- const handlePlaceOrder = (paymentStatus = "Pending") => {
-  const finalAddress = selectedAddressId && addresses.length > 0
-    ? addresses.find(a => a.id === selectedAddressId)
-    : {
-        fullName: newAddress.fullName,
-        email: newAddress.email,
-        phoneNumber: newAddress.phoneNumber,
-        addressLine: newAddress.addressLine,
-        pincode: newAddress.pincode,
-      };
-
-  const orderData = {
-    items: cart,
-    totalAmount: getTotalPrice(),
-    paymentMethod,
-    address: finalAddress,
-    paymentStatus,
-    userId,
-  };
-
-  console.log("Placing order:", orderData);
-
-  // ✅ Remove ordered items from cart
-  const remainingCart = [];
-  cart.forEach(async (cartItem) => {
-    // Remove from wishlist only if wishlistId exists
-    if (cartItem.wishlistId) {
-      try {
-        await removeFromWishlist(cartItem.wishlistId);
-      } catch (err) {
-        console.error("Failed to remove wishlist item:", err);
-      }
-    }
-    // Remove from cart
-    try {
-      await removeFromCart(cartItem.productId); // use your cart API remove
-    } catch (err) {
-      console.error("Failed to remove cart item:", err);
-    }
-  });
-
-  localStorage.removeItem("checkoutCart");
-  navigate("/orders");
-};
-
-
-  const handleRazorpaySuccess = () => handlePlaceOrder("Paid");
-  const handleRazorpayFailure = () => alert("Payment Failed");
-
   const handleSaveAddress = async () => {
     if (!isAddressValid) return;
 
     try {
       const payload = {
-       id: editingAddressId || 0,
+        id: editingAddressId || 0,
         fullName: newAddress.fullName,
         email: newAddress.email,
         phoneNumber: newAddress.phoneNumber,
         addressLine: newAddress.addressLine,
         pincode: newAddress.pincode,
-   
       };
 
       if (editingAddressId) {
@@ -224,6 +166,103 @@ const Payment = () => {
       pincode: addr.pincode || ""
     });
     setShowNewAddressForm(true);
+  };
+
+  const getSubtotal = () => {
+    return cart.reduce((t, item) => t + item.productPrice * item.productQuantity, 0);
+  };
+
+  const getTotalPrice = () => {
+    const subtotal = getSubtotal();
+    if (paymentMethod === "Cash on Delivery") return subtotal * 1.05;
+    return subtotal;
+  };
+
+  const handlePlaceOrder = async (paymentStatus = "Pending", paymentId = null) => {
+    const finalAddress = selectedAddressId && addresses.length > 0
+      ? addresses.find(a => a.id === selectedAddressId)
+      : {
+          fullName: newAddress.fullName,
+          email: newAddress.email,
+          phoneNumber: newAddress.phoneNumber,
+          addressLine: newAddress.addressLine,
+          pincode: newAddress.pincode,
+        };
+
+    const orderData = {
+      items: cart,
+      totalAmount: getTotalPrice(),
+      paymentMethod,
+      address: finalAddress,
+      paymentStatus,
+      userId,
+      paymentId
+    };
+
+    console.log("Placing order:", orderData);
+
+    // Call your API to create the order
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (response.ok) {
+        // Remove items from cart and wishlist
+        for (const cartItem of cart) {
+          if (cartItem.wishlistId) {
+            try {
+              await removeFromWishlist(cartItem.wishlistId);
+            } catch (err) {
+              console.error("Failed to remove wishlist item:", err);
+            }
+          }
+          
+          try {
+            await removeCartItem(cartItem.productId);
+          } catch (err) {
+            console.error("Failed to remove cart item:", err);
+          }
+        }
+
+        localStorage.removeItem("checkoutCart");
+        navigate("/orders");
+      } else {
+        console.error("Failed to create order");
+        setError("Failed to place order. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error placing order:", err);
+      setError("Failed to place order. Please try again.");
+    }
+  };
+
+  const simulateOnlinePayment = async () => {
+    setIsProcessingPayment(true);
+    
+    // Simulate payment processing
+    try {
+      // Simulate API call to payment gateway
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Simulate successful payment
+      const paymentSuccess = Math.random() > 0.2; // 80% success rate for demo
+      
+      if (paymentSuccess) {
+        await handlePlaceOrder("Paid", `pay_${Date.now()}`);
+      } else {
+        setError("Payment failed. Please try again or use a different payment method.");
+      }
+    } catch (err) {
+      console.error("Payment error:", err);
+      setError("Payment processing error. Please try again.");
+    } finally {
+      setIsProcessingPayment(false);
+    }
   };
 
   const isAddressValid = 
@@ -507,11 +546,25 @@ const Payment = () => {
 
             {paymentMethod === "Online Payment" ? (
               <div className="mt-6">
-                <RazorpayPayment
-                  amount={getTotalPrice()}
-                  onSuccess={handleRazorpaySuccess}
-                  onFailure={handleRazorpayFailure}
-                />
+                <button
+                  onClick={simulateOnlinePayment}
+                  disabled={isProcessingPayment}
+                  className={`bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 w-full ${
+                    isProcessingPayment ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {isProcessingPayment ? (
+                    <div className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing Payment...
+                    </div>
+                  ) : (
+                    "Pay Now"
+                  )}
+                </button>
               </div>
             ) : paymentMethod === "Cash on Delivery" ? (
               <button
@@ -521,9 +574,9 @@ const Payment = () => {
                 Place Order
               </button>
             ) : (
-             <p className="text-red-600 font-bold animate-pulse text-center mt-2">
-    Please select a payment method
-  </p>
+              <p className="text-red-600 font-bold animate-pulse text-center mt-2">
+                Please select a payment method
+              </p>
             )}
           </>
         )}
